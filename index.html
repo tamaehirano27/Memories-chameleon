@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Meccha Chameleon — Anniversary Edition</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Georgia, "Times New Roman", serif;
+  background: #f6f0e7;
+  color: #3d332c;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* =========================
+   INTRO
+========================= */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  background: #f6f0e7;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 100;
+  padding: 30px;
+  transition: opacity 0.8s ease;
+}
+
+.intro.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro h1 {
+  font-size: clamp(38px, 10vw, 80px);
+  font-weight: normal;
+  letter-spacing: 5px;
+  margin-bottom: 18px;
+}
+
+.intro p {
+  font-size: 16px;
+  line-height: 1.8;
+  max-width: 500px;
+  margin-bottom: 35px;
+}
+
+.start-btn {
+  border: 1px solid #3d332c;
+  background: transparent;
+  color: #3d332c;
+  padding: 14px 30px;
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.start-btn:hover {
+  background: #3d332c;
+  color: #f6f0e7;
+}
+
+/* =========================
+   GAME
+========================= */
+
+.game {
+  min-height: 100vh;
+  position: relative;
+  display: none;
+}
+
+.game.show {
+  display: block;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 22px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.logo {
+  font-size: 15px;
+  letter-spacing: 2px;
+}
+
+.counter {
+  font-size: 14px;
+}
+
+/* =========================
+   CHAMELEONS
+========================= */
+
+.chameleon {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  cursor: pointer;
+  opacity: 0.65;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  z-index: 10;
+}
+
+.chameleon:hover {
+  transform: scale(1.2);
+  opacity: 1;
+}
+
+.chameleon-body {
+  position: absolute;
+  width: 38px;
+  height: 24px;
+  border-radius: 50%;
+  background: #6f8065;
+  top: 25px;
+  left: 18px;
+}
+
+.chameleon-head {
+  position: absolute;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: #6f8065;
+  top: 18px;
+  left: 5px;
+}
+
+.chameleon-eye {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: #fff;
+  border-radius: 50%;
+  top: 23px;
+  left: 9px;
+}
+
+.chameleon-eye::after {
+  content: "";
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #333;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+}
+
+.tail {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  border: 5px solid #6f8065;
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  top: 22px;
+  right: 3px;
+  transform: rotate(35deg);
+}
+
+/* =========================
+   POSITIONS
+========================= */
+
+.chameleon:nth-child(1) {
+  top: 15%;
+  left: 12%;
+}
+
+.chameleon:nth-child(2) {
+  top: 25%;
+  right: 14%;
+}
+
+.chameleon:nth-child(3) {
+  top: 42%;
+  left: 30%;
+}
+
+.chameleon:nth-child(4) {
+  top: 55%;
+  right: 25%;
+}
+
+.chameleon:nth-child(5) {
+  top: 72%;
+  left: 10%;
+}
+
+.chameleon:nth-child(6) {
+  top: 80%;
+  right: 10%;
+}
+
+.chameleon:nth-child(7) {
+  top: 34%;
+  left: 70%;
+}
+
+.chameleon:nth-child(8) {
+  top: 65%;
+  left: 45%;
+}
+
+.chameleon:nth-child(9) {
+  top: 18%;
+  left: 50%;
+}
+
+.chameleon:nth-child(10) {
+  top: 88%;
+  left: 55%;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 38, 32, 0.88);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 25px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 50;
+}
+
+.modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  width: min(92vw, 600px);
+  max-height: 92vh;
+  background: #f6f0e7;
+  padding: 18px;
+  text-align: center;
+  position: relative;
+  overflow-y: auto;
+}
+
+.photo-frame {
+  width: 100%;
+  background: #ddd;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.photo-frame img {
+  display: block;
+  width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+}
+
+.modal h2 {
+  font-size: 25px;
+  font-weight: normal;
+  margin-bottom: 8px;
+}
+
+.modal p {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  color: #3d332c;
+  cursor: pointer;
+  z-index: 5;
+}
+
+/* =========================
+   FINISH
+========================= */
+
+.finish {
+  position: fixed;
+  inset: 0;
+  background: #f6f0e7;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 30px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+  z-index: 80;
+}
+
+.finish.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.finish h2 {
+  font-size: clamp(35px, 8vw, 65px);
+  font-weight: normal;
+  margin-bottom: 20px;
+}
+
+.finish p {
+  max-width: 500px;
+  line-height: 1.9;
+  font-size: 15px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+  .header {
+    padding: 18px;
+  }
+
+  .chameleon {
+    transform: scale(0.85);
+  }
+
+  .chameleon:hover {
+    transform: scale(1);
+  }
+
+  .modal-content {
+    padding: 12px;
+  }
+
+  .modal h2 {
+    font-size: 22px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     INTRO
+========================= -->
+
+<section class="intro" id="intro">
+
+  <h1>Meccha Chameleon</h1>
+
+  <p>
+    Our little anniversary game.<br>
+    There are 10 memories hidden around here.<br>
+    Find all the chameleons.
+  </p>
+
+  <button class="start-btn" id="startBtn">
+    Start
+  </button>
+
+</section>
+
+
+<!-- =========================
+     GAME
+========================= -->
+
+<main class="game" id="game">
+
+  <header class="header">
+
+    <div class="logo">
+      MECCHA CHAMELEON
+    </div>
+
+    <div class="counter">
+      <span id="found">0</span> / 10
+    </div>
+
+  </header>
+
+
+  <!-- CHAMELEON 1 -->
+
+  <div class="chameleon" onclick="handleFind(0, this)">
+
+    <div class="chameleon-head"></div>
+    <div class="chameleon-eye"></div>
+    <div class="chameleon-body"></div>
+    <div class="tail"></div>
+
+  </div>
+
+
+  <!-- CHAMELEON 2 -->
+
+  <div class="chameleon" onclick="handleFind(1, this)">
+
+    <div class="chameleon-head"></div>
+    <div class="chameleon-eye"></div>
+    <div class="chameleon-body"></div>
+    <div class="tail"></div>
+
+  </div>
+
+
+  <!-- CHAMELEON 3 -->
+
+  <div class="chameleon" onclick="handleFind(2, this)">
+
+    <div class="chameleon-head"></div>
+    <div class="chameleon-eye"></div>
+    <div class="chameleon-body"></div>
+    <div class="tail"></div>
+
+  </div>
+
+
+  <!-- CHAMELEON 4 -->
+
+  <div class="chameleon" onclick="handleFind(3, this)">
+
+    <div class="chameleon-head"></div>
+    <div class="chameleon-eye"></div>
+    <div class="chameleon-body"></div>
+    <div class="tail"></div>
+
+  </div>
+
+
+  <!-- CHAMELEON 5 -->
+
+  <div class="chameleon" onclick="handleFind(4, this)">
+
+    <div class="chameleon-head"></div>
+    <div class="chameleon-eye"></div>
+    <div class="chameleon-body"></div>
+    <div class="tail"></div>
+
+  </div>
+
+
+  <!-- CHAMELEON 6 -->
+
+  <div class="chameleon" onclick="handleFind(5, this)">
+
+    <div class="chameleon-head"></div>
+    <div class="chameleon-eye"></div>
+    <div class="chameleon-body"></div>
+    <div class="tail"></div>
+
+  </div>
+
+
+  <!-- CHAMELEON 7 -->
+
+  <div class="chameleon" onclick="handleFind(6, this)">
+
+    <div class="chameleon-head"></div>
+    <div class="chameleon-eye"></div>
+    <div class="chameleon-body"></div>
+    <div class="tail"></div>
+
+  </div>
+
+
+  <!-- CHAMELEON 8 -->
+
+  <div class="chameleon" onclick="handleFind(7, this)">
+
+    <div class="chameleon-head"></div>
+    <div class="chameleon-eye"></div>
+    <div class="chameleon-body"></div>
+    <div class="tail"></div>
+
+  </div>
+
+
+  <!-- CHAMELEON 9 -->
+
+  <div class="chameleon" onclick="handleFind(8, this)">
+
+    <div class="chameleon-head"></div>
+    <div class="chameleon-eye"></div>
+    <div class="chameleon-body"></div>
+    <div class="tail"></div>
+
+  </div>
+
+
+  <!-- CHAMELEON 10 -->
+
+  <div class="chameleon" onclick="handleFind(9, this)">
+
+    <div class="chameleon-head"></div>
+    <div class="chameleon-eye"></div>
+    <div class="chameleon-body"></div>
+    <div class="tail"></div>
+
+  </div>
+
+</main>
+
+
+<!-- =========================
+     PHOTO MODAL
+========================= -->
+
+<div class="modal" id="modal">
+
+  <div class="modal-content">
+
+    <button class="close-btn" id="closeBtn">
+      ×
+    </button>
+
+    <div class="photo-frame">
+
+      <img
+        id="modalImg"
+        src=""
+        alt="Memory"
+      >
+
+    </div>
+
+    <h2 id="modalCaption"></h2>
+
+    <p id="modalSub"></p>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     FINISH
+========================= -->
+
+<section class="finish" id="finish">
+
+  <h2>10 / 10</h2>
+
+  <p>
+    You found all our memories.<br><br>
+
+    Thank you for all the special days,
+    ordinary days,
+    silly days,
+    drunk days,
+    and everything in between.<br><br>
+
+    I hope we can make many more memories together.
+  </p>
+
+</section>
+
+
+<script>
+
+/* =========================
+   MEMORIES
+========================= */
+
+/*
+  IMPORTANT:
+
+  The photos must be in the SAME folder as index.html.
+
+  Their names must be:
+
+  photo1.jpg
+  photo2.jpg
+  photo3.jpg
+  photo4.jpg
+  photo5.jpg
+  photo6.jpg
+  photo7.jpg
+  photo8.jpg
+  photo9.jpg
+  photo10.jpg
+*/
+
+const memories = [
+
+  {
+    img: "photo1.jpg",
+    caption: "Places in the world",
+    sub: "We went to a lot of places in the world"
+  },
+
+  {
+    img: "photo2.jpg",
+    caption: "Special people",
+    sub: "We met each other’s special people"
+  },
+
+  {
+    img: "photo3.jpg",
+    caption: "New things",
+    sub: "We experienced new things together"
+  },
+
+  {
+    img: "photo4.jpg",
+    caption: "Home places",
+    sub: "We went to each other’s home places"
+  },
+
+  {
+    img: "photo5.jpg",
+    caption: "Fun days",
+    sub: "We had so many fun days"
+  },
+
+  {
+    img: "photo6.jpg",
+    caption: "Drunk days",
+    sub: "We had so many drunk days"
+  },
+
+  {
+    img: "photo7.jpg",
+    caption: "Ordinary days",
+    sub: "We had special ordinary days"
+  },
+
+  {
+    img: "photo8.jpg",
+    caption: "Someone’s glasses",
+    sub: "We had someone’s glasses somehow"
+  },
+
+  {
+    img: "photo9.jpg",
+    caption: "Family",
+    sub: "Our family will be the one for the other too"
+  },
+
+  {
+    img: "photo10.jpg",
+    caption: "Happiness",
+    sub: "We have so many happiness in the memories"
+  }
+
+];
+
+
+/* =========================
+   VARIABLES
+========================= */
+
+const intro = document.getElementById("intro");
+const game = document.getElementById("game");
+const startBtn = document.getElementById("startBtn");
+
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modalImg");
+const modalCaption = document.getElementById("modalCaption");
+const modalSub = document.getElementById("modalSub");
+const closeBtn = document.getElementById("closeBtn");
+
+const foundText = document.getElementById("found");
+const finish = document.getElementById("finish");
+
+let found = 0;
+
+
+/* =========================
+   START GAME
+========================= */
+
+startBtn.addEventListener("click", function() {
+
+  intro.classList.add("hide");
+
+  setTimeout(function() {
+    intro.style.display = "none";
+    game.classList.add("show");
+  }, 800);
+
+});
+
+
+/* =========================
+   FIND CHAMELEON
+========================= */
+
+function handleFind(index, element) {
+
+  // Don't count the same chameleon twice
+
+  if (element.dataset.found === "true") {
+    return;
+  }
+
+  element.dataset.found = "true";
+
+  element.style.opacity = "0.15";
+  element.style.pointerEvents = "none";
+
+  found++;
+
+  foundText.textContent = found;
+
+  const memory = memories[index];
+
+  modalImg.src = memory.img;
+
+  modalCaption.textContent = memory.caption;
+
+  modalSub.textContent = memory.sub;
+
+  modal.classList.add("active");
+
+}
+
+
+/* =========================
+   CLOSE MODAL
+========================= */
+
+function closeModal() {
+
+  modal.classList.remove("active");
+
+  if (found === 10) {
+
+    setTimeout(function() {
+
+      finish.classList.add("show");
+
+    }, 500);
+
+  }
+
+}
+
+
+closeBtn.addEventListener("click", closeModal);
+
+
+/* =========================
+   CLICK OUTSIDE MODAL
+========================= */
+
+modal.addEventListener("click", function(event) {
+
+  if (event.target === modal) {
+
+    closeModal();
+
+  }
+
+});
+
+
+/* =========================
+   ESC KEY
+========================= */
+
+document.addEventListener("keydown", function(event) {
+
+  if (event.key === "Escape") {
+
+    closeModal();
+
+  }
+
+});
+
+
+/* =========================
+   IMAGE ERROR CHECK
+========================= */
+
+modalImg.addEventListener("error", function() {
+
+  console.log("Image could not be loaded:", modalImg.src);
+
+  modalCaption.textContent = "Photo not found";
+
+  modalSub.textContent =
+    "Please check that the image is named correctly.";
+
+});
+
+
+</script>
+
+</body>
+</html>
